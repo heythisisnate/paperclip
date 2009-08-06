@@ -110,7 +110,7 @@ module Paperclip
     end
 
     def url(style = nil, opts = nil)
-      if %w{ thumb small }.include?(style)
+      if %w{thumb small}.include?(style.to_s)
         unsigned_url style, opts
       else
         signed_url style, opts
