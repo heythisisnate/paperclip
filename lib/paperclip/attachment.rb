@@ -100,13 +100,21 @@ module Paperclip
     # security, however, for performance reasons.  set
     # include_updated_timestamp to false if you want to stop the attachment
     # update time appended to the url
-    #def url style = default_style, include_updated_timestamp = true
-    #  url = original_filename.nil? ? interpolate(@default_url, style) : interpolate(@url, style)
-    #  include_updated_timestamp && updated_at ? [url, updated_at].compact.join(url.include?("?") ? "&" : "?") : url
-    #end
+    def unsigned_url style = default_style, include_updated_timestamp = true
+      url = original_filename.nil? ? interpolate(@default_url, style) : interpolate(@url, style)
+      include_updated_timestamp && updated_at ? [url, updated_at].compact.join(url.include?("?") ? "&" : "?") : url
+    end
 
-    def url(style = nil, time_limit = 5.seconds)
+    def signed_url(style = nil, time_limit = 5.seconds)
       AWS::S3::S3Object.url_for(path(style).gsub(%r{^/}, ""), 'dpic', :expires_in => time_limit)
+    end
+
+    def url(style = nil, opts = nil)
+      if %w{ thumb small }.include?(style)
+        unsigned_url style, opts
+      else
+        signed_url style, opts
+      end
     end
 
     # Returns the path of the attachment as defined by the :path option. If the
