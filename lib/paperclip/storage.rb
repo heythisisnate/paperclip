@@ -192,10 +192,11 @@ module Paperclip
         @queued_for_write.each do |style, file|
           begin
             log("saving #{path(style)}")
+            permissions = %{thumb small}.include?(style.to_s) ? :public_read : :authenticated_read
             AWS::S3::S3Object.store(path(style),
-                                    file,
-                                    bucket_name,
-                                    {:content_type => instance_read(:content_type)}.merge(@s3_headers))
+                file,
+                bucket_name,
+                {:content_type => instance_read(:content_type)}.merge({:access => permissions}).merge(@s3_headers))
           rescue AWS::S3::ResponseError => e
             raise
           end
