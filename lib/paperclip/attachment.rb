@@ -111,9 +111,9 @@ module Paperclip
 
     def url(style = nil, opts = nil)
       if %w{thumb small}.include?(style.to_s)
-        unsigned_url style, opts
+        unsigned_url style, true
       else
-        signed_url style, opts
+        signed_url style, 5.seconds
       end
     end
 
